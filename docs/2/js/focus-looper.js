@@ -14,39 +14,54 @@ class FocusLooper {
                 attributeOldValue: true,
                 attributeFilter: 'href disabled type aria-hidden style display class tabindex contenteditable'.split(' '),
             });
+            this._scrollAxis = {x:0, y:0}
             // スクロール時、activeElementが画面外かつフォーカス対象が画面内なら、その要素にfocus()したい
             window.addEventListener('scroll', (e)=>{
-                this.el
+//                console.log(e);
+                this.scrollAutoFocus();
             });
             this.i = 0;
             this._el = document.activeElement;
         });
     }
-    withinActiveElement() {// activeElementが画面内にあるなら真を返す
-        /*
-        window.scrollX
-        window.scrollY
-        // スクロール位置を取得
-//        const scrollTop = window.scrollTop();
-//        const scrollBtm = scrollTop + window.height;
-        const scrollTop = window.scrollTop();
-        const scrollBtm = scrollTop + window.height;
-
-        // 対象要素の位置を取得
-        const target = document.activeElement;
-        const targetTop = target.offset.top;
-        const targetBtm = targetTop + target.height;
-
-        return scrollBtm > targetTop && scrollTop < targetBtm;
-        */
-        /*
-        // 画面内にある場合
-        if (scrollBtm > targetTop && scrollTop < targetBtm) {
-            target.addClass('is-show');
-        } else {
-            target.removeClass('is-show');
+    /*
+    #getScrollXDir(b) {
+             if (this._scrollAxis.y===b.y) {return 'equal'}
+        else if (this._scrollAxis.y > b.y) {return 'up'}
+        else {return 'down'}
+    }
+    #getScrollYDir(b) {
+             if (this._scrollAxis.y===b.y) {return 'equal'}
+        else if (this._scrollAxis.y > b.y) {return 'left'}
+        else {return 'right'}
+    }
+    #getAutoFocusCandidateEls(sy) {
+        if ('eq'===sy) {return []}
+        else if ('up'===sy) {return this.els.slice(0, this.i)}
+        else {return this.els.slice(this.i)}
+    }
+    */
+    scrollAutoFocus() {//スクロール時にactiveElementが画面外にあり、かつフォーカス対象要素が画面内にあるならそこにフォーカスする
+        const b = document.activeElement?.getBoundingClientRect();
+        if (!b) {return}
+        const W = document.documentElement.clientWidth;
+        const H = document.documentElement.clientHeight;
+        if (0<=b.x && b.x<=W && 0<=b.y && b.y<=H) {return} // activeElementが画面内にある
+        console.log(this.i, this.els.slice(this.i))
+//        const sx = this.#getScrollXDir(b);
+//        const sy = this.#getScrollXDir(b);
+//        this._scrollAxis.y = b.y;
+//        this._scrollAxis.x = b.x;
+//        const cands = this.#getAutoFocusCandidateEls(sy);
+//        const isUp = this._scrollAxis.y > b.y
+//        const isLeft = this._scrollAxis.x
+        // activeElement以前／以降の要素が（スクロール方向によって対象が変わる）
+        //for (let el of this.els.slice(this.i)) {// activeElement以降の要素が
+        //for (let el of this.els) {
+        for (let i=0; i<this.l; i++) {
+            const B = this.els[i].getBoundingClientRect();
+            if (0<=B.x && B.x<=W && 0<=B.y && B.y<=H) {this.i=i;console.log('!!!!!', this.el);return;} // 画面内にあればフォーカスする
         }
-        */
     }
     #FOCUSABLE_ELEMENTS = [
         'a[href]:not([display="none"])',
